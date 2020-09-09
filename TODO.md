@@ -1,4 +1,4 @@
-* [ ]add link to socker io
+* [ ] add link to socker io
 
 * [ ] doc for client
 * [ ] doc for server
