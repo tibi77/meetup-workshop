@@ -1,3 +1,5 @@
+* add link to socker io
+
 [ ] doc for client
 [ ] doc for server
 [ ] doc for deploy
