@@ -1,38 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { initiateSocket, disconnectSocket,
-  subscribeToChat, sendMessage } from './utils';
+import React, { useEffect, useState } from 'react';
+import Peer from 'peerjs';
 
 
-function App() {
-  const rooms = ['A', 'B', 'C'];
-  const [room, setRoom] = useState(rooms[0]);
-  const [message, setMessage] = useState('');
-  const [chat, setChat] = useState<Array<string>>([]);
+const App = () => {
+  const [state, setState] = useState<any>();
+  const [callerID, setCallerID] = useState<string>('');
+
   useEffect(() => {
-    if (room) initiateSocket(room);
-    subscribeToChat((err, data) => {
-      if(err) return;
-      setChat((oldChats: Array<string>) =>[data, ...oldChats])
+    let pseudoRandomID = ('ID' + parseInt(Math.random() * 100 + '')).replace('.', '');
+    let peer = new Peer(pseudoRandomID);
+    setState({
+      peer: peer
     });
-    return () => {
-      disconnectSocket();
-    }
-  }, [room]);
+    console.log(peer)
+  }, []);
+
+  useEffect(() => {
+    if (!navigator.mediaDevices)
+      return 
+    navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+      .then(stream => {
+        if (!(state && callerID))
+          return;
+        const call = state.peer.call(callerID, stream);
+        call.on('stream', (remoteStream: MediaStream | MediaSource | Blob | null) => {
+          console.log(remoteStream)
+          let video = document.getElementById('video-chat') as HTMLVideoElement;
+          video.srcObject = remoteStream;
+        });
+      }).catch(e => console.error({ e })
+      )
+  }, [callerID]);
   
+  useEffect(() => {
+    if (state)
+    state.peer.on('call', (call: any) => {
+      console.log('receiving call from ' + call.peer)
+      navigator.mediaDevices.getUserMedia({video: true, audio: true}).then((stream : any) => {
+        call.answer(stream); // Answer the call with an A/V stream.
+        call.on('stream', (remoteStream : any) => {
+          let video = document.getElementById('video-chat') as HTMLVideoElement;
+          video.srcObject = remoteStream;
+          // Show stream in some <video> element.
+        });
+      });
+    });
+  }, [state])
+
   return (
-    <div>
-      <h1>Room: {room}</h1>
-      { rooms.map((r, i) =>
-        <button onClick={() => setRoom(r)} key={i}>{r}</button>)}
-      <h1>Live Chat:</h1>
-      <input type="text" name="name" value={message}
-        onChange={e => setMessage(e.target.value)} />
-      <button onClick={()=> sendMessage(room,message)}>Send</button>
-      { chat.map((m,i) => <p key={i}>{m}</p>) }
+    <div className="App">
+      { callerID &&  <video id="video-chat" autoPlay={true}> </video> }
+      <h1>{state?.peer?.id}</h1>
+      <form onSubmit={
+        e => {
+          e.preventDefault();
+          console.log(callerID);
+        }
+      }>
+        <input
+          type='text'
+          placeholder='Input who you want to call'
+          id='callerID'
+          value={callerID}
+          onChange={e =>
+            setCallerID(e.target.value)
+          } />
+        <button type='submit'> Call </button>
+      </form>
+      <br />
     </div>
   );
-}
+};
 
 export default App;

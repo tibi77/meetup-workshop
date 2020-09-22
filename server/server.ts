@@ -26,10 +26,12 @@ app.use('/peerjs', peerServer);
 
 io.on('connection', socket => {
     console.log('connection');
+
     socket.on("*",function(event,data) {
         console.log(event);
         console.log(data);
     });
+
     socket.on('join-room', (roomId, userId) => {
         console.log('join')
         console.log(roomId);

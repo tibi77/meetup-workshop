@@ -5,3 +5,4 @@
 * [ ] doc for deploy
 * [ ] jest test for server
 * [ ] jest test for client
+* [ ] check the nameing
