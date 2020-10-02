@@ -25,7 +25,7 @@ With the following features:
 
 ## Technologies 👨‍💻
 - [Express](https://expressjs.com/)
-- Socket.io
+- [Socket.io](https://socket.io/)
 - [Peer server](https://github.com/peers/peerjs-server)
 
 ## Contact
