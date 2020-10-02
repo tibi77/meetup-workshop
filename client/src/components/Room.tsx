@@ -23,13 +23,16 @@ const Room = (props: any) => {
             myVideo.current.srcObject = stream;
             socketRef.current?.emit('join room', roomID);
             socketRef.current?.on('all users', (users: any) => {
-                var peers: any[] = [];
-                users.forEach((user: any) => {
-                    const peer = createPeer(user, socketRef.current?.id ?? '', stream);
-                    peers.push({
-                        peerID: user,
+                let peers: any[] = [];
+                users.forEach((userID: any) => {
+                    // @ts-ignore
+                    const peer = createPeer(userID, socketRef.current.id, stream);
+                    peerRef.current.push({
+                        peerID: userID,
                         peer
-                    })
+                    });
+                    peers.push(peer);
+
                 });
                 setPeers(peers);
             });
@@ -40,7 +43,7 @@ const Room = (props: any) => {
                     peerID: payload.callerID,
                     peer
                 });
-                setPeers([...peers, peer]);
+                setPeers(peers => [...peers, peer]);
             });
 
 
@@ -63,15 +66,14 @@ const Room = (props: any) => {
 
 
             socketRef.current?.on('receiving returned signal', (payload: any) => {
-                const peerEmitter = peerRef.current.find(p => p.peerID === payload.id);
-                peerEmitter?.peer.signal(payload.signal);
+                const item = peerRef.current.find(p => p.peerID === payload.id);
+                item.peer.signal(payload.signal);
             });
 
         })
     }, []);
 
     const createPeer = (userToSignal: string, callerID: string, stream: any) => {
-        console.log('createPeer');
         /**
          * 
          * Create a new peer using the Peer constructor from simplepeer-js
@@ -91,7 +93,6 @@ const Room = (props: any) => {
         );
 
         peer.on('signal', signal => {
-            console.log(callerID);
             socketRef.current?.emit('sending signal', { userToSignal, callerID, signal });
         });
 
@@ -104,7 +105,6 @@ const Room = (props: any) => {
     }
 
     const addPeer = (incomingSignal: string, callerID: string, stream: any) => {
-        console.log('addPeer');
         /**
           * 
           *  Add new peer this is not the initiator so it should be configured like this:
@@ -127,7 +127,7 @@ const Room = (props: any) => {
         );
 
         peer.on('signal', signal => {
-            socketRef.current?.emit('returning signal', { signal, callerID });
+            socketRef.current?.emit("returning signal", { signal, callerID });
         });
 
         peer.signal(incomingSignal);
@@ -136,43 +136,34 @@ const Room = (props: any) => {
     }
 
 
-useEffect(() => {
-    console.log(peers);
-
-    console.log("=================");
-}, [peers]);
-
-
     return <div>
 
         <VideoElement userVideo={myVideo} />
         {
-            peers.forEach(peer => 
-            {
-                console.log(peer);
-                return <Video12 peer={peer} />
-            })
+            peers.map(peer =>  <Video12 peer={peer}/>)
         }
     </div>
 };
 
 
 const Video12 = (props: any) => {
-    const ref = useRef();
-    console.log(props.peer)
-    console.log('something else')
 
+    const ref = useRef();
     useEffect(() => {
-        if (props.peer)
-            props.peer.on("stream", (stream: any) => {
+        console.log(props)
+
+        if(props.peer)
+         {
+             console.log('stream')
+            props.peer.on("stream", (stream : any) => {
                 // @ts-ignore
                 ref.current.srcObject = stream;
             })
+         }
+
     }, []);
     // @ts-ignore
-    return (<> <video autoPlay ref={ref} /> <label>{props.peer ?? ''}</label> </>
-
-    );
+    return <video autoPlay ref={ref} />;
 }
 
 const VideoElement = (
