@@ -10,15 +10,12 @@ With the following features:
 
 ## Objectives
 
-* [ ] 📝 [Diagram the Full Stack]()
-* [ ] 🔎 [Differentiate between Client and Server](docs/ClientVsServer.md)
-* [ ] 🔎 [Define the protocols that we are going to use](docs/Protocols.md)
-* [ ] 🏋 [Set up the server (this si the heavy lifting part 😹)](server/index.ts) | [documentation](doc/Server.md)
+* [ ] 📝 [Diagram the Full Stack](https://www.w3schools.com/whatis/whatis_fullstack.asp)
+* [ ] 🏋 [Set up the server (this si the heavy lifting part 😹)](server/index.ts) ... that I am just going to do for you :D
   * [ ] 🌄 [Express](https://expressjs.com/) server
-  * [ ] 💯 Socket.io server
+  * [ ] 💯 [Socket.io](https://socket.io/) server
   * [ ] 🍫 [Peer server](https://github.com/peers/peerjs-server)
 * [ ] 🏃 [Set up the client](client/index.js) | [documentation](doc/Client.md)
-  * [ ] 🎱 Socker.io client
   * [ ] ❓ `Nice to have` 🔒 User login; Get user UID ❔
 * [ ] 🔗 Connect client to the server
 * [ ] ✨ Make the client look fancy
